@@ -1,0 +1,10 @@
+﻿matplotlib
+numpy
+pandas
+plotly
+streamlit
+statsmodels
+yfinance
+nbformat
+ipykernel
+ipywidgets
