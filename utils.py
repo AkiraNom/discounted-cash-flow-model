@@ -1,7 +1,10 @@
+# solve yfinance error on streamlit cloud
+# import appdirs as ad
+# ad.user_cache_dir = lambda *args: "/tmp"
+
 import numpy as np
 import pandas as pd
 import yfinance as yf
-from yfinance.exceptions import YFException
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
@@ -429,7 +432,7 @@ class PageLayout:
 
             if submitted:
                 st.session_state.projection_parameters = {
-                    'n' : n_years,
+                    'n_years' : n_years,
                     'revenue_growth_rate' : revenue_growth_rate,
                     'ebit_rate' : ebit_rate,
                     'dna_rate' : dna_rate,
@@ -573,3 +576,16 @@ class PageLayout:
             st.session_state.dcf_results['tgrs'] = tgrs
 
         st.plotly_chart(fig)
+
+    @staticmethod
+    def data_downloader(df, button_label, file_name, time):
+
+        st.write('')
+        csv = DataProcessing.convert_df(df)
+        st.download_button(
+            label=f"Download {button_label} as CSV",
+            data=csv,
+            file_name=f"{file_name}{time}.csv",
+            mime="text/csv",
+        )
+        st.write('')

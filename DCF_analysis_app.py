@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import datetime
 
 from utils import DataProcessing, DiscountedCashFlow, PageLayout
 
@@ -47,7 +48,7 @@ with tabs[0]:
 
     ticker = st.session_state.ticker
 
-    if ticker != None:
+    if ticker != '':
         data = DataProcessing.fetch_ticker_data(ticker)
         company_info = DataProcessing.key_metrics(data)
         incomestmt_data, balancesheet_data, cashflow_data = DataProcessing.extract_financial_data(data)
@@ -99,7 +100,7 @@ if projection_parameters == {}:
 # data projection
 df = DataProcessing.compile_financial_statement_metrics(data)
 df_proj = DataProcessing.project_finantial_data(df,
-                                                projection_parameters['n'],
+                                                projection_parameters['n_years'],
                                                 DiscountedCashFlow.linear_interpolate,
                                                 projection_parameters['revenue_growth_rate'],
                                                 projection_parameters['ebit_rate'],
@@ -119,9 +120,15 @@ if 'wacc_parameters' not in st.session_state:
 
 PageLayout.wacc_parameters(company_info)
 
-st.session_state.wacc_parameters['cash'] = balancesheet_data.iloc[balancesheet_data.index.get_loc('Cash And Cash Equivalents'), 0]
-st.session_state.wacc_parameters['debt'] = balancesheet_data.iloc[balancesheet_data.index.get_loc('Total Liabilities Net Minority Interest'), 0]
-st.session_state.wacc_parameters['tax_rate'] = projection_parameters['tax_rate']
+if st.session_state.wacc_parameters != None:
+
+    st.session_state.wacc_parameters['cash'] = balancesheet_data.iloc[balancesheet_data.index.get_loc('Cash And Cash Equivalents'), 0]
+    st.session_state.wacc_parameters['debt'] = balancesheet_data.iloc[balancesheet_data.index.get_loc('Total Liabilities Net Minority Interest'), 0]
+    st.session_state.wacc_parameters['tax_rate'] = projection_parameters['tax_rate']
+
+else:
+    PageLayout.warning_message("Please click the apply button to set input parameters for WACC")
+    st.stop()
 
 wacc_parameters = st.session_state.wacc_parameters
 
@@ -144,12 +151,12 @@ PageLayout.projection_plot(df_proj, wacc_parameters)
 
 st.markdown("""### <center><strong>:blue[DCF Analysis]</strong></center>""", unsafe_allow_html=True)
 
-PageLayout.dcf_analysis_section(df_proj, wacc_parameters, projection_parameters['n'])
+PageLayout.dcf_analysis_section(df_proj, wacc_parameters, projection_parameters['n_years'])
 
 st.write('')
 st.markdown(f"""### <center><strong>{company_info['shortName']} Sensitivity Analysis</strong></center>""", unsafe_allow_html=True)
 
-PageLayout.dcf_sensitivity_plot(df_proj, wacc_parameters, projection_parameters['n'])
+PageLayout.dcf_sensitivity_plot(df_proj, wacc_parameters, projection_parameters['n_years'])
 
 st.write('')
 st.divider()
@@ -160,27 +167,33 @@ st.markdown(f"""### <center><strong>Data Download</strong></center>""", unsafe_a
 with st.expander('View Projected Finalcial Data'):
 
     st.write('')
-    csv = DataProcessing.convert_df(df_proj.dropna(axis=1).T)
-    st.download_button(
-        label="Download projected data as CSV",
-        data=csv,
-        file_name="projected_financial_data.csv",
-        mime="text/csv",
-    )
-    st.write('')
+    date = datetime.datetime.now().strftime('_%Y_%m_%d')
+    PageLayout.data_downloader(df_proj.dropna(axis=1).T, 'projected data', 'projected_financial_data', date)
     st.data_editor(df_proj.dropna(axis=1).T)
 
-with st.expander('View Implied Share Price Data'):
+
+
+with st.expander('View Parameters to estimate the implied share price'):
+
+    simulated_parameters = {'time' : datetime.datetime.now()}
+    simulated_parameters['ticker'] = st.session_state['ticker']
+
+    parameters_list = [st.session_state.projection_parameters.items(), st.session_state.wacc_parameters.items()]
+    for parameter in parameters_list:
+        for key, val in parameter:
+            simulated_parameters[key] = val
+
+    df_simulated_parameters = pd.DataFrame(simulated_parameters, index=[0])
+    PageLayout.data_downloader(df_simulated_parameters.T, 'simulated parameters', 'simulated_parameters', date)
+    st.data_editor(df_simulated_parameters.T, use_container_width=True)
+
+
+
+with st.expander('View Simulated DCF results'):
 
     st.write('')
     df_dcf_results = pd.DataFrame(st.session_state.dcf_results['data'], columns=st.session_state.dcf_results['waccs'], index=st.session_state.dcf_results['tgrs'])
-    dcf_csv = DataProcessing.convert_df(df_dcf_results)
-    st.download_button(
-        label="Download simulated DCF results as CSV",
-        data=dcf_csv,
-        file_name="simulated_dcf_data.csv",
-        mime="text/csv",
-    )
-    st.write('')
+
+    PageLayout.data_downloader(df_dcf_results, 'simulated DCF results', 'simulated_dcf_results', date)
     st.write('rows : TGRs, columns : WACCs')
     st.data_editor(df_dcf_results)
