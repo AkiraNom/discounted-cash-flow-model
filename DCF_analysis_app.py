@@ -22,6 +22,10 @@ with intro1:
     st.write("")
 
 ###############################
+# login session
+PageLayout.check_password()
+
+###############################
 st.subheader('📁 Overview of Company')
 
 tabs = st.tabs([

@@ -3,8 +3,9 @@ numpy
 pandas
 plotly
 streamlit
-statsmodels
+streamlit-authenticator
 yfinance
+appdirs
 nbformat
 ipykernel
 ipywidgets
