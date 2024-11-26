@@ -4,7 +4,7 @@ This is an interactive web appliation develped with streaml that calculates the 
 
 The DCF method relies on projecting future cash flows and discounting them back to their present value. Since assumptions about growth rates, discount rates, terminal values, and other factors significantly influence estimation, sensitivity plots enable you to simulated how there parameters influence estimation.
 
-check the application -> [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://finance-analysis-j22zwkeeepzxpym9ej9smg.streamlit.app/)
+check the application -> [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://discounted-cash-flow-model-e7vmmuqpvmh8rbzerp9hbe.streamlit.app//)
 
 
 ### Background

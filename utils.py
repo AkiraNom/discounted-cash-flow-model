@@ -1,4 +1,4 @@
-solve yfinance error on streamlit cloud
+# solve yfinance error on streamlit cloud
 import appdirs as ad
 ad.user_cache_dir = lambda *args: "/tmp"
 
