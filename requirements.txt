@@ -3,7 +3,7 @@ numpy
 pandas
 plotly
 streamlit
-statsmodels
+streamlit-authenticator
 yfinance
 nbformat
 ipykernel

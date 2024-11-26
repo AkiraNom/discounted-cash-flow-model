@@ -8,7 +8,11 @@ import yfinance as yf
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
+import time
 
+import streamlit_authenticator as stauth
+import yaml
+from yaml.loader import SafeLoader
 
 class DiscountedCashFlow():
 
@@ -360,6 +364,50 @@ class DataProcessing:
             del st.session_state[key]
 
 class PageLayout:
+
+    def check_password():
+        with open('./config.yaml') as file:
+            config = yaml.load(file, Loader=SafeLoader)
+
+        authenticator = stauth.Authenticate(
+            config['credentials'],
+            config['cookie']['name'],
+            config['cookie']['key'],
+            config['cookie']['expiry_days']
+        )
+
+        if not st.session_state.get("authentication_status"):
+            with st.container(border=True):
+                st.code("""
+                        Please use the following user information to test the application.
+                            sample user information:
+                                user 1:
+                                    username: jsmith
+                                    password: abc
+                                user 2:
+                                    username: rbriggs
+                                    password: def
+                            """)
+        try:
+            authenticator.login()
+        except Exception as e:
+            st.error(e)
+
+        if st.session_state.get("authentication_status"):
+            # authenticator = st.session_state.get("authenticator")
+            authenticator.logout(location="sidebar", key="logout-app-home")
+            # Put the main code and logic for your page here.
+            success = st.success("You are logged in!", icon="✅")
+            time.sleep(3)
+            success.empty()
+
+        elif st.session_state["authentication_status"] is False:
+            st.error("Username/password is incorrect")
+            st.stop()
+        elif st.session_state["authentication_status"] is None:
+            st.warning("Please enter your username and password")
+            st.stop()
+
 
     def key_metric_container(data: dict):
 
