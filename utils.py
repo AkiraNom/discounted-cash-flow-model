@@ -390,24 +390,27 @@ class PageLayout:
                             """)
         try:
             authenticator.login()
+
         except Exception as e:
             st.error(e)
 
         if st.session_state.get("authentication_status"):
-            # authenticator = st.session_state.get("authenticator")
+
             authenticator.logout(location="sidebar", key="logout-app-home")
-            # Put the main code and logic for your page here.
-            success = st.success("You are logged in!", icon="✅")
-            time.sleep(3)
-            success.empty()
+
+            if not st.session_state.get("login_success"):
+                success = st.success("You are logged in!", icon="✅")
+                time.sleep(3)
+                success.empty()
+                st.session_state["login_success"] = True
 
         elif st.session_state["authentication_status"] is False:
             st.error("Username/password is incorrect")
             st.stop()
+
         elif st.session_state["authentication_status"] is None:
             st.warning("Please enter your username and password")
             st.stop()
-
 
     def key_metric_container(data: dict):
 

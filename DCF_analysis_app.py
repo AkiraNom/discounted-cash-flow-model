@@ -21,6 +21,7 @@ with intro1:
     st.info(intro)
     st.write("")
 
+st.write(st.session_state)
 ###############################
 # login session
 PageLayout.check_password()
@@ -39,15 +40,15 @@ with tabs[0]:
     ticker = ''
     if 'ticker' not in st.session_state:
         st.session_state.ticker = ticker
-    with cols[0]:
 
+    with cols[0]:
         with st.form('Search a company'):
             selected_ticker = st.text_input('Type a Ticker symbol', value='MSFT')
             submitted = st.form_submit_button('🔎 Search')
 
         if submitted:
-            DataProcessing.clear_session_state()
-            if 'ticker' not in st.session_state:
+            # DataProcessing.clear_session_state()
+            # if 'ticker' not in st.session_state:
                 st.session_state.ticker = selected_ticker
 
     ticker = st.session_state.ticker
