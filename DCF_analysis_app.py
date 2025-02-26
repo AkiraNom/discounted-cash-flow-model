@@ -21,7 +21,6 @@ with intro1:
     st.info(intro)
     st.write("")
 
-st.write(st.session_state)
 ###############################
 # login session
 PageLayout.check_password()

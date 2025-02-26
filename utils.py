@@ -412,6 +412,10 @@ class PageLayout:
             st.warning("Please enter your username and password")
             st.stop()
 
+        # clear the session_state
+        if st.session_state.get("logout-app-home"):
+            st.session_state.clear()
+
     def key_metric_container(data: dict):
 
         with st.container():
